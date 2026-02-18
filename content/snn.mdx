@@ -1,0 +1,44 @@
+---
+title: "SNN Gesture Recognition"
+description: "Event-driven gesture classification using spiking neural networks on DVS data."
+tags: ["snntorch", "DVS", "PyTorch", "Neuromorphic", "Python"]
+date: "2024-10-15"
+---
+
+## Problem
+
+Conventional frame-based neural networks process redundant information in static frames, leading to high energy consumption and latency. The goal was to build a gesture recognition system that processes asynchronous event streams from a Dynamic Vision Sensor (DVS), leveraging the temporal precision of spiking neural networks.
+
+## System Architecture
+
+The pipeline follows a neuromorphic-native design:
+
+- **Input**: DVS event streams (polarity, x, y, timestamp)
+- **Encoding**: Temporal spike encoding to convert events into spike trains
+- **Network**: Multi-layer SNN with Leaky Integrate-and-Fire (LIF) neurons
+- **Training**: Surrogate gradient descent using snntorch
+- **Output**: Spike rate decoding for classification
+
+## Technical Decisions
+
+**snntorch over NEST/Brian2** — Selected for GPU-accelerated training and seamless PyTorch integration. The surrogate gradient approach enables backpropagation through non-differentiable spike functions.
+
+**Temporal Encoding** — Events are binned into temporal windows and converted to spike trains, preserving the microsecond-level timing information that makes DVS superior to frame cameras for motion tasks.
+
+**LIF Neuron Model** — Chosen for computational efficiency while retaining biologically relevant dynamics. The membrane potential decay constant was tuned to match the temporal statistics of gesture events.
+
+## Challenges
+
+- **Class imbalance**: Some gestures produced significantly fewer events. Addressed through temporal augmentation (random time shifts and polarity flips).
+- **Hyperparameter sensitivity**: SNN training is sensitive to membrane time constants and threshold values. Implemented a systematic sweep using Optuna.
+- **Vanishing spikes**: Deep SNN layers can silence due to information loss. Used residual connections adapted for spike-based computation.
+
+## Results
+
+- Achieved 92.4% accuracy on the DVS128 Gesture dataset
+- 10x reduction in computational operations compared to equivalent ANN
+- Sub-millisecond inference latency suitable for real-time applications
+
+## What I Learned
+
+Working with spiking neural networks fundamentally changed how I think about neural computation. The shift from rate-based to timing-based information processing reveals that biological intelligence is far more elegant and efficient than our standard deep learning paradigms suggest.

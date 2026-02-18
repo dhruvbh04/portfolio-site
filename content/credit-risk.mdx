@@ -1,0 +1,43 @@
+---
+title: "Credit Risk via Coupled Markov Chains"
+description: "Stochastic credit risk modeling using coupled Markov chain dynamics."
+tags: ["Markov Chains", "Stochastic", "Python", "NumPy"]
+date: "2024-06-10"
+---
+
+## Problem
+
+Standard credit risk models often treat individual defaults as independent events, ignoring the systemic correlations that drive portfolio-level risk. The goal was to model correlated credit transitions using coupled Markov chains, capturing how one entity's credit deterioration can influence others.
+
+## System Architecture
+
+The model consists of:
+
+- **Individual chains**: Each obligor follows a Markov chain over credit states (AAA → D)
+- **Coupling mechanism**: Transition matrices are modulated by a shared latent factor representing systemic risk
+- **Simulation engine**: Monte Carlo simulation of correlated default paths
+- **Risk metrics**: Joint default probabilities, expected loss distributions, and tail risk measures
+
+## Technical Decisions
+
+**Coupled vs. Copula Models** — While Gaussian copulas are industry standard, coupled Markov chains naturally capture the temporal dynamics of credit migration, not just point-in-time correlations.
+
+**Latent Factor Approach** — The coupling is achieved through a common factor that shifts transition probabilities toward lower credit states during stress periods, creating realistic default clustering.
+
+**Efficient Simulation** — Vectorized NumPy operations for parallel simulation of thousands of portfolio paths, achieving 10,000 scenarios per second.
+
+## Challenges
+
+- **Calibration**: Estimating coupling parameters from sparse default data required maximum likelihood estimation with regularization.
+- **State space explosion**: With N obligors and K credit states, the joint state space is K^N. Approximation through conditional independence given the latent factor was necessary.
+- **Validation**: Historical stress scenarios (2008 crisis) were used to validate that the model produces realistic tail behavior.
+
+## Results
+
+- Captured default clustering observed in historical crises
+- Produced Value-at-Risk and Expected Shortfall estimates consistent with regulatory benchmarks
+- Demonstrated sensitivity to systemic risk factors through interpretable coupling parameters
+
+## What I Learned
+
+Financial systems are inherently about dependencies. This project taught me that the most dangerous assumption in risk modeling is independence — and that mathematical frameworks for capturing dependence (coupling, copulas, factor models) are essential tools for understanding systemic risk.

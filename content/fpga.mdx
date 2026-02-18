@@ -1,0 +1,50 @@
+---
+title: "Hardware Synthesizable Trading Algorithms"
+description: "FPGA-targeted trading logic with hardware-level latency optimization."
+tags: ["FPGA", "Verilog", "Trading", "HFT", "SystemVerilog"]
+date: "2024-04-05"
+---
+
+## Problem
+
+In high-frequency trading, latency measured in nanoseconds determines competitive advantage. Software-based trading systems are fundamentally limited by OS scheduling, network stack overhead, and memory access patterns. The goal was to implement core trading algorithms directly in hardware, targeting FPGA deployment for deterministic, sub-microsecond execution.
+
+## System Architecture
+
+The hardware trading system consists of:
+
+- **Market data parser**: Deserializes exchange feed messages in hardware
+- **Order book engine**: Maintains a hardware-based limit order book with O(1) top-of-book access
+- **Signal generator**: Implements trading signals using fixed-point arithmetic
+- **Risk checker**: Hardware-enforced position limits and order validation
+- **Order encoder**: Formats and serializes outbound orders
+
+```
+Market Feed → Parser → Order Book → Signal → Risk → Order Out
+                                       ↓
+                                  Strategy Logic
+```
+
+## Technical Decisions
+
+**FPGA over ASIC** — FPGAs provide the reprogrammability needed for strategy iteration while still achieving hardware-level latency. ASICs offer better performance but require months of fabrication.
+
+**Fixed-Point Arithmetic** — Floating-point units consume significant FPGA resources and add latency. Fixed-point with configurable precision (e.g., 32.16 format) provides sufficient price resolution with minimal logic.
+
+**Pipelined Architecture** — Each stage operates on the output of the previous stage in a single clock cycle, achieving tick-to-trade latency under 500 nanoseconds.
+
+## Challenges
+
+- **Resource constraints**: FPGA logic utilization must be carefully managed. The order book engine required novel data structures optimized for hardware (sorted linked lists in block RAM).
+- **Testing**: Hardware testing requires cycle-accurate simulation. Built a comprehensive SystemVerilog testbench with market data replay capability.
+- **Numerical precision**: Fixed-point rounding errors can accumulate and create PnL discrepancies. Implemented error tracking and periodic reconciliation.
+
+## Results
+
+- Tick-to-trade latency of 450 nanoseconds (deterministic)
+- Order book updates in a single clock cycle
+- Successfully synthesized for Xilinx Alveo U200 at 250 MHz
+
+## What I Learned
+
+Hardware design forces a fundamentally different way of thinking about algorithms. Every operation has a physical cost in logic elements and routing delay. This discipline — thinking about computation as a spatial, physical process rather than a temporal, abstract one — profoundly informed my understanding of computational efficiency.

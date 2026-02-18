@@ -1,0 +1,43 @@
+---
+title: "MOSFET Threshold Voltage Prediction"
+description: "Device-agnostic ML regression for MOSFET threshold voltage modeling."
+tags: ["Scikit-learn", "Regression", "Semiconductor", "Python"]
+date: "2024-08-20"
+---
+
+## Problem
+
+Threshold voltage (Vth) is a critical parameter in MOSFET design that determines switching behavior, leakage current, and overall circuit performance. Traditional physics-based models require extensive characterization for each device variant. The goal was to build a machine learning model that predicts Vth across different device architectures using measurable physical parameters.
+
+## System Architecture
+
+A supervised regression pipeline:
+
+- **Data**: Collected from device simulations and published measurement datasets across multiple MOSFET architectures (planar, FinFET, GAA)
+- **Features**: Gate oxide thickness, channel doping, gate length, fin width, temperature, etc.
+- **Models**: Evaluated Linear Regression, Random Forest, Gradient Boosting, and Neural Networks
+- **Validation**: Device-agnostic cross-validation — train on some architectures, test on unseen ones
+
+## Technical Decisions
+
+**Feature Engineering** — Physical scaling relationships (e.g., oxide capacitance = ε/tox) were used to create derived features that encode known semiconductor physics, improving model generalization.
+
+**Gradient Boosting** — Selected as the primary model after systematic comparison. Its ability to capture nonlinear interactions between device parameters matched the complex physics of threshold voltage.
+
+**Device-Agnostic Validation** — Rather than random train/test splits, the validation strategy held out entire device architectures to test true generalization capability.
+
+## Challenges
+
+- **Scale diversity**: Feature values span orders of magnitude (nm to μm, 10^15 to 10^18 cm^-3 doping). Careful normalization was essential.
+- **Limited data**: High-fidelity measurements are expensive. Used physics-informed data augmentation to expand the training set.
+- **Interpretability**: Semiconductor engineers require model interpretability. SHAP analysis was used to verify that the model learned physically meaningful relationships.
+
+## Results
+
+- Mean Absolute Error of 12mV across device architectures
+- Successfully predicted Vth for unseen FinFET geometries
+- SHAP analysis confirmed physically consistent feature importance
+
+## What I Learned
+
+This project demonstrated that machine learning can complement — not replace — physics-based modeling. The most effective approach was embedding domain knowledge into the ML pipeline (feature engineering, validation strategy) rather than relying purely on data-driven learning.
