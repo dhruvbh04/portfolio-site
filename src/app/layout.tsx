@@ -29,6 +29,8 @@ export const metadata: Metadata = {
         "Portfolio of Dhruv Bhardwaj. Machine Learning, Deep Learning, Mathematical Modeling.",
     keywords: [
         "Dhruv Bhardwaj",
+        "BITS Pilani",
+        "BITS Goa",
         "Machine Learning",
         "Deep Learning",
         "Spiking Neural Networks",
